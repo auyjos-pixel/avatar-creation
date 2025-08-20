@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Course Progress</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <style>
+  body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:16px}
+  .wrap{max-width:560px}
+  .bar{height:18px;background:#eee;border-radius:9px;overflow:hidden}
+  .fill{height:100%;width:0;background:#3b82f6;transition:width .4s}
+  .pct{margin:.4rem 0 .8rem;font-weight:600}
+</style>
+    </head>
+    <body>
+        <div class="wrap">
+            <h3>Your Progress</h3>
+            <div id="pct" class="pct">0% complete</div>
+            <div class="bar"><div id="fill" class="fill"></div></div>
+            <p style="color:#666">This updates as you unlock the next progress
+                link in Modules.</p>
+        </div>
+        <script>
+  const q = new URLSearchParams(location.search);
+  const p = Math.max(0, Math.min(100, parseInt(q.get('p')||'0',10)));
+  document.getElementById('fill').style.width = p + '%';
+  document.getElementById('pct').textContent = `${p}% complete`;
+</script>
+    </body>
+</html>

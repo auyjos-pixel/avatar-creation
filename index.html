@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Ready Player Me – Export Avatar</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body { margin:0; padding:16px; }
+    iframe { width:100%; height:760px; border:0; }
+    .out { margin-top:12px; display:flex; gap:8px; align-items:center; }
+    input[type=text]{ width:100%; max-width:720px; padding:8px; }
+    button{ padding:8px 12px; cursor:pointer; }
+    .ok{ color:#0a7a0a; margin-left:8px; }
+  </style>
+    </head>
+    <body>
+        <h2>Create your avatar</h2>
+
+        <iframe id="rpm"
+            src="https://demo.readyplayer.me/avatar?frameApi&clearCache"
+            allow="camera *; microphone *; clipboard-write; web-share"
+            referrerpolicy="origin-when-cross-origin"></iframe>
+
+        <div class="out" id="out" style="display:none">
+            <input id="url" type="text" readonly />
+            <button id="copy">Copy URL</button>
+            <span id="msg" class="ok"></span>
+        </div>
+
+        <script>
+    const frame = document.getElementById('rpm');
+    const out   = document.getElementById('out');
+    const urlEl = document.getElementById('url');
+    const msg   = document.getElementById('msg');
+
+    // Subscribe to RPM events
+    window.addEventListener('message', (event) => {
+      let data; try { data = JSON.parse(event.data); } catch { return; }
+      if (!data || data.source !== 'readyplayerme') return;
+
+      if (data.eventName === 'v1.frame.ready') {
+        frame.contentWindow.postMessage(JSON.stringify({
+          target:'readyplayerme', type:'subscribe', eventName:'v1.**'
+        }), '*');
+      }
+
+      if (data.eventName === 'v1.avatar.exported') {
+        const url = data.data.url;
+        urlEl.value = url;
+        out.style.display = 'flex';
+        msg.textContent = 'Avatar exported ✔';
+      }
+    });
+
+    // Copy button
+    document.getElementById('copy').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(urlEl.value);
+        msg.textContent = 'Copied to clipboard ✔';
+      } catch {
+        msg.textContent = 'Copy failed — select and Ctrl+C';
+      }
+    });
+  </script>
+    </body>
+</html>
